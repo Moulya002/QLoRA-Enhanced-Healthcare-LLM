@@ -1,0 +1,66 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.installed.cfg
+*.egg
+
+# ---- Virtual environments ----
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# ---- Environment / secrets ----
+.env
+.env.*
+!.env.example
+
+# ---- Jupyter ----
+.ipynb_checkpoints/
+
+# ---- ML artifacts (large, regenerable) ----
+# Raw + processed data can be re-downloaded / re-generated, so we don't commit them.
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Model weights & adapters
+outputs/
+checkpoints/
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.gguf
+adapters/
+models/
+
+# ---- Experiment tracking ----
+wandb/
+mlruns/
+
+# ---- Logs ----
+logs/
+*.log
+
+# ---- OS / IDE ----
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# ---- Testing / coverage ----
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
