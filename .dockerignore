@@ -1,0 +1,24 @@
+# Keep build context small + avoid leaking secrets/large artifacts into images.
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.env
+.env.*
+!.env.example
+wandb/
+logs/
+data/raw/*
+data/processed/*
+tests/
+docs/
+assets/
+*.md
+!README.md
+# Note: outputs/ (adapter weights) is mounted as a volume, not copied in.
+outputs/
