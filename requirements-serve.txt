@@ -1,0 +1,29 @@
+# ============================================================================
+# Lean dependencies for SERVING (FastAPI inference) only.
+#
+# Deliberately excludes:
+#   * bitsandbytes  -> 4-bit needs an NVIDIA GPU; no Apple-Silicon/CPU wheel.
+#   * trl / datasets / wandb / eval libs -> only needed for training/eval.
+#
+# Used by the Docker API image so it builds on arm64 (Apple Silicon) and stays
+# small. Training still uses the full requirements.txt on a CUDA machine.
+# ============================================================================
+
+# CPU build of PyTorch (no CUDA). The +cpu wheels are served from the official
+# PyTorch index, added below.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.3.1
+
+transformers==4.43.3
+accelerate==0.33.0
+peft==0.12.0
+sentencepiece==0.2.0
+safetensors==0.4.3
+protobuf==4.25.3
+
+fastapi==0.111.1
+uvicorn[standard]==0.30.3
+pydantic==2.8.2
+pydantic-settings==2.3.4
+python-dotenv==1.0.1
+httpx==0.27.0
