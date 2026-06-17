@@ -1,0 +1,68 @@
+# ============================================================================
+# Orchestrates the two services:
+#   api        - FastAPI inference backend (loads the QLoRA model)
+#   streamlit  - chat UI that talks to `api`
+#
+# Usage:
+#   cp .env.example .env       # fill in HF_TOKEN etc.
+#   docker compose up --build
+#   -> UI:  http://localhost:8501
+#   -> API: http://localhost:8000/docs
+#
+# GPU: uncomment the `deploy.resources.reservations.devices` block on `api`
+# (requires the NVIDIA Container Toolkit) and a CUDA base image in Dockerfile.
+# ============================================================================
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: healthcare-qlora-api:latest
+    container_name: healthcare-qlora-api
+    env_file: .env
+    environment:
+      # Inside the compose network the API listens on 0.0.0.0:8000.
+      API_HOST: 0.0.0.0
+      API_PORT: "8000"
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount trained adapter + HF cache so we don't bake weights into the image
+      # and don't re-download models on every container start.
+      - ./outputs:/app/outputs
+      - hf_cache:/app/.hf_cache
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    # ---- GPU (uncomment to enable) ----
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    image: healthcare-qlora-ui:latest
+    container_name: healthcare-qlora-ui
+    environment:
+      # Reach the backend by its compose service name.
+      API_URL: http://api:8000
+    ports:
+      # Host 8502 -> container 8501 (8501 is used by another project on this host).
+      - "8502:8501"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  hf_cache:
